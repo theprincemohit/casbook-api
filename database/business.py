@@ -4,7 +4,7 @@ from sqlalchemy import func
 from models.business import BusinessModel
 
 
-def create_business(db: Session, business_data: dict) -> BusinessModel:
+def create_new_business(db: Session, business_data: dict) -> BusinessModel:
     """Create a new business in database"""
     db_business = BusinessModel(**business_data)
     db.add(db_business)

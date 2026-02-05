@@ -3,7 +3,7 @@ from sqlalchemy.orm import Session
 from typing import List, Optional
 from schema.business import Business, BusinessCreate, BusinessUpdate
 from config import get_db
-import database
+import database.business as database_business
 
 router = APIRouter(prefix="/businesses", tags=["businesses"])
 
@@ -11,7 +11,7 @@ router = APIRouter(prefix="/businesses", tags=["businesses"])
 @router.post("/", response_model=Business, status_code=201)
 def create_business(business: BusinessCreate, db: Session = Depends(get_db)):
     """Create a new business"""
-    new_business = database.create_business(db, business.model_dump())
+    new_business = database_business.create_new_business(db, business.model_dump())
     return new_business
 
 
@@ -23,13 +23,13 @@ def read_businesses(
     db: Session = Depends(get_db),
 ):
     """Get all businesses with optional filtering and pagination"""
-    return database.get_all_businesses(db, skip=skip, limit=limit, industry=industry)
+    return database_business.get_all_businesses(db, skip=skip, limit=limit, industry=industry)
 
 
 @router.get("/{business_id}", response_model=Business)
 def read_business(business_id: int, db: Session = Depends(get_db)):
     """Get a specific business by ID"""
-    business = database.get_business(db, business_id)
+    business = database_business.get_business(db, business_id)
     if business is None:
         raise HTTPException(status_code=404, detail="Business not found")
     return business
@@ -40,7 +40,7 @@ def update_business(
     business_id: int, updated_business: BusinessCreate, db: Session = Depends(get_db)
 ):
     """Update a business"""
-    business = database.update_business(db, business_id, updated_business.model_dump())
+    business = database_business.update_business(db, business_id, updated_business.model_dump())
     if business is None:
         raise HTTPException(status_code=404, detail="Business not found")
     return business
@@ -53,7 +53,7 @@ def partial_update_business(
     db: Session = Depends(get_db),
 ):
     """Partially update a business"""
-    business = database.partial_update_business(
+    business = database_business.partial_update_business(
         db, business_id, business_update.model_dump(exclude_unset=True)
     )
     if business is None:
@@ -64,7 +64,7 @@ def partial_update_business(
 @router.delete("/{business_id}", status_code=204)
 def delete_business(business_id: int, db: Session = Depends(get_db)):
     """Delete a business"""
-    success = database.delete_business(db, business_id)
+    success = database_business.delete_business(db, business_id)
     if not success:
         raise HTTPException(status_code=404, detail="Business not found")
 
@@ -72,4 +72,4 @@ def delete_business(business_id: int, db: Session = Depends(get_db)):
 @router.get("/stats/overview")
 def get_statistics(db: Session = Depends(get_db)):
     """Get statistics about all businesses"""
-    return database.get_statistics(db)
+    return database_business.get_statistics(db)
