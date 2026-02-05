@@ -11,9 +11,7 @@ router = APIRouter(prefix="/passbook", tags=["passbook"])
 @router.post("/", response_model=Passbook, status_code=201)
 def create_passbook(passbook: PassbookCreate, db: Session = Depends(get_db)):
     """Create a new passbook"""
-    print("Creating passbook with data:", passbook)
     data  = passbook.model_dump()
-    print("Data to be inserted into DB:", data)
     new_passbook = database_passbook.create_new_passbook(db, data)
     return new_passbook
 
