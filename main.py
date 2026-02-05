@@ -1,7 +1,6 @@
 from fastapi import FastAPI
-from routers import business
 from config import engine, Base
-from db_models import BusinessModel
+from routers.main import api_router
 
 # Create tables
 Base.metadata.create_all(bind=engine)
@@ -9,7 +8,7 @@ Base.metadata.create_all(bind=engine)
 app = FastAPI(title="Business CRUD API", description="A complete CRUD API for business management")
 
 # Include routers
-app.include_router(business.router)
+app.include_router(api_router)
 
 
 # Root endpoint

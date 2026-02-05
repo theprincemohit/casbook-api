@@ -1,7 +1,7 @@
 from fastapi import APIRouter, HTTPException, Query, Depends
 from sqlalchemy.orm import Session
 from typing import List, Optional
-from models import Business, BusinessCreate, BusinessUpdate
+from schema.business import Business, BusinessCreate, BusinessUpdate
 from config import get_db
 import database
 

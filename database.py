@@ -1,7 +1,7 @@
 from typing import List, Optional
 from sqlalchemy.orm import Session
 from sqlalchemy import func
-from db_models import BusinessModel
+from models.business import BusinessModel
 
 
 def create_business(db: Session, business_data: dict) -> BusinessModel:
