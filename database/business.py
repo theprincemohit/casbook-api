@@ -14,14 +14,14 @@ def create_new_business(db: Session, business_data: dict) -> BusinessModel:
 
 
 def get_all_businesses(
-    db: Session, skip: int = 0, limit: int = 10, industry: Optional[str] = None
+    db: Session, skip: int = 0, limit: int = 10, industry: Optional[str] = None, current_user = None
 ) -> List[BusinessModel]:
     """Get all businesses with optional filtering"""
     query = db.query(BusinessModel)
 
-    if industry:
+    if current_user:
         query = query.filter(
-            func.lower(BusinessModel.industry) == func.lower(industry)
+            BusinessModel.user_id == current_user.id
         )
 
     return query.offset(skip).limit(limit).all()

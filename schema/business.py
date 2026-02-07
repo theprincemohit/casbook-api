@@ -4,6 +4,7 @@ from datetime import datetime
 
 
 class BusinessBase(BaseModel):
+    user_id: int = Field(..., ge=1)
     name: str = Field(..., min_length=1, max_length=100)
     description: Optional[str] = Field(None, max_length=500)
     industry: str

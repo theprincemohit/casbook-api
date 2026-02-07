@@ -1,6 +1,7 @@
 from fastapi import APIRouter, HTTPException, Query, Depends
 from sqlalchemy.orm import Session
 from typing import List, Optional
+from routers.auth import validate_token
 from schema.business import Business, BusinessCreate, BusinessUpdate
 from config import get_db
 import database.business as database_business
@@ -9,7 +10,7 @@ router = APIRouter(prefix="/businesses", tags=["businesses"])
 
 
 @router.post("/", response_model=Business, status_code=201)
-def create_business(business: BusinessCreate, db: Session = Depends(get_db)):
+def create_business(business: BusinessCreate, db: Session = Depends(get_db), current_user = Depends(validate_token)):
     """Create a new business"""
     new_business = database_business.create_new_business(db, business.model_dump())
     return new_business
@@ -21,9 +22,10 @@ def read_businesses(
     limit: int = Query(10, ge=1, le=100),
     industry: Optional[str] = None,
     db: Session = Depends(get_db),
+    current_user = Depends(validate_token)
 ):
     """Get all businesses with optional filtering and pagination"""
-    return database_business.get_all_businesses(db, skip=skip, limit=limit, industry=industry)
+    return database_business.get_all_businesses(db, skip=skip, limit=limit, industry=industry, current_user=current_user)
 
 
 @router.get("/{business_id}", response_model=Business)

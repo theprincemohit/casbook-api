@@ -8,6 +8,7 @@ class BusinessModel(Base):
     __tablename__ = "businesses"
 
     id = Column(Integer, primary_key=True, index=True)
+    user_id = Column(Integer(), nullable=False)
     name = Column(String(100), nullable=False)
     description = Column(String(500), nullable=True)
     industry = Column(String(100), nullable=False)
@@ -22,6 +23,7 @@ class BusinessModel(Base):
         """Convert model to dictionary"""
         return {
             "id": self.id,
+            "user_id": self.user_id,
             "name": self.name,
             "description": self.description,
             "industry": self.industry,
