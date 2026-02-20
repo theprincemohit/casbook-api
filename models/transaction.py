@@ -9,7 +9,8 @@ class TransactionModel(Base):
     __tablename__ = "transaction"
 
     id = Column(Integer, primary_key=True, index=True)
-    passbook_id = Column(Integer, ForeignKey("passbook.id", ondelete="CASCADE"))
+    passbook_id = Column(Integer, nullable=False)
+    user_id = Column(Integer, nullable=False)
     txn_type = Column(String(10), nullable=False)  # debit or credit
     amount = Column(DECIMAL(15, 2), nullable=False)
     description = Column(Text)
@@ -30,6 +31,7 @@ class TransactionModel(Base):
         return {
             "id": self.id,
             "passbook_id": self.passbook_id,
+            "user_id": self.user_id,
             "txn_type": self.txn_type,
             "amount": self.amount,
             "description": self.description,

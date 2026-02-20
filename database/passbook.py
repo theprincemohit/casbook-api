@@ -14,45 +14,40 @@ def create_new_passbook(db: Session, passbook_data: dict) -> PassbookModel:
 
 
 def get_all_passbooks(
-    db: Session, skip: int = 0, limit: int = 10, industry: Optional[str] = None
+    db: Session, skip: int = 0, limit: int = 10, business_id: int = None,
+    current_user = None
 ) -> List[PassbookModel]:
     """Get all passbooks with optional filtering"""
     query = db.query(PassbookModel)
 
-    if industry:
-        query = query.filter(
-            func.lower(PassbookModel.industry) == func.lower(industry)
+    query = query.filter(
+            PassbookModel.business_id == business_id,
+            PassbookModel.user_id == current_user.id
         )
 
     return query.offset(skip).limit(limit).all()
 
 
-def get_passbook(db: Session, passbook_id: int) -> Optional[PassbookModel]:
+def get_passbook(db: Session, passbook_id: int, 
+                 current_user = None,
+                 business_id: int = None) -> Optional[PassbookModel]:
     """Get a specific passbook by ID"""
-    return db.query(PassbookModel).filter(PassbookModel.id == passbook_id).first()
-
-
-def update_passbook(
-    db: Session, passbook_id: int, passbook_data: dict
-) -> Optional[PassbookModel]:
-    """Update a passbook"""
-    db_passbook = db.query(PassbookModel).filter(PassbookModel.id == passbook_id).first()
-    if db_passbook is None:
-        return None
-
-    for key, value in passbook_data.items():
-        setattr(db_passbook, key, value)
-
-    db.commit()
-    db.refresh(db_passbook)
-    return db_passbook
+    query = db.query(PassbookModel).filter(
+        PassbookModel.id == passbook_id,
+        PassbookModel.user_id == current_user.id,
+        PassbookModel.business_id == business_id)
+    return query.first()
 
 
 def partial_update_passbook(
-    db: Session, passbook_id: int, passbook_data: dict
+    db: Session, business_id: int, current_user = None, passbook_id: int = None, passbook_data: dict = None
 ) -> Optional[PassbookModel]:
     """Partially update a passbook"""
-    db_passbook = db.query(PassbookModel).filter(PassbookModel.id == passbook_id).first()
+    db_passbook = db.query(PassbookModel).filter(
+        PassbookModel.id == passbook_id,
+        PassbookModel.user_id == current_user.id,
+        PassbookModel.business_id == business_id
+    ).first()
     if db_passbook is None:
         return None
 
@@ -71,9 +66,13 @@ def partial_update_passbook(
     return db_passbook
 
 
-def delete_passbook(db: Session, passbook_id: int) -> bool:
+def delete_passbook(db: Session, passbook_id: int, current_user = None, business_id: int = None) -> bool:
     """Delete a passbook"""
-    db_passbook = db.query(PassbookModel).filter(PassbookModel.id == passbook_id).first()
+    db_passbook = db.query(PassbookModel).filter(
+        PassbookModel.id == passbook_id,
+        PassbookModel.user_id == current_user.id,
+        PassbookModel.business_id == business_id
+    ).first()
     if db_passbook is None:
         return False
 

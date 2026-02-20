@@ -29,23 +29,23 @@ def read_businesses(
 
 
 @router.get("/{business_id}", response_model=Business)
-def read_business(business_id: int, db: Session = Depends(get_db)):
+def read_business(business_id: int, db: Session = Depends(get_db), current_user = Depends(validate_token)):
     """Get a specific business by ID"""
-    business = database_business.get_business(db, business_id)
+    business = database_business.get_business(db, business_id, current_user)
     if business is None:
         raise HTTPException(status_code=404, detail="Business not found")
     return business
 
 
-@router.put("/{business_id}", response_model=Business)
-def update_business(
-    business_id: int, updated_business: BusinessCreate, db: Session = Depends(get_db)
-):
-    """Update a business"""
-    business = database_business.update_business(db, business_id, updated_business.model_dump())
-    if business is None:
-        raise HTTPException(status_code=404, detail="Business not found")
-    return business
+# @router.put("/{business_id}", response_model=Business)
+# def update_business(
+#     business_id: int, updated_business: BusinessCreate, db: Session = Depends(get_db)
+# ):
+#     """Update a business"""
+#     business = database_business.update_business(db, business_id, updated_business.model_dump())
+#     if business is None:
+#         raise HTTPException(status_code=404, detail="Business not found")
+#     return business
 
 
 @router.patch("/{business_id}", response_model=Business)
@@ -53,10 +53,11 @@ def partial_update_business(
     business_id: int,
     business_update: BusinessUpdate,
     db: Session = Depends(get_db),
+    current_user = Depends(validate_token)
 ):
     """Partially update a business"""
     business = database_business.partial_update_business(
-        db, business_id, business_update.model_dump(exclude_unset=True)
+        db, business_id, business_update.model_dump(exclude_unset=True), current_user
     )
     if business is None:
         raise HTTPException(status_code=404, detail="Business not found")
@@ -64,11 +65,14 @@ def partial_update_business(
 
 
 @router.delete("/{business_id}", status_code=204)
-def delete_business(business_id: int, db: Session = Depends(get_db)):
+def delete_business(business_id: int, 
+                    db: Session = Depends(get_db),
+                    current_user = Depends(validate_token)):
     """Delete a business"""
-    success = database_business.delete_business(db, business_id)
+    success = database_business.delete_business(db, business_id, current_user)
     if not success:
         raise HTTPException(status_code=404, detail="Business not found")
+    return success
 
 
 @router.get("/stats/overview")

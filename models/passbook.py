@@ -9,6 +9,7 @@ class PassbookModel(Base):
 
     id = Column(Integer, primary_key=True, index=True)
     business_id = Column(Integer(), nullable=False)
+    user_id = Column(Integer(), nullable=False)
     name = Column(String(100), nullable=False)
     description = Column(String(500), nullable=True)
     created_at = Column(DateTime, default=datetime.utcnow)

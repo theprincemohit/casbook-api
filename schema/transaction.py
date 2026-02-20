@@ -18,10 +18,10 @@ class TransactionCreate(TransactionBase):
 
 
 class TransactionUpdate(BaseModel):
-    passbook_id: int
+    passbook_id: Optional[int] = None
   #  name: Optional[str] = Field(None, min_length=1, max_length=100)
-    txn_type: str = Field(..., max_length=500)
-    amount: float = Field(..., gt=0)
+    txn_type: Optional[str] = Field(None, max_length=500)
+    amount: Optional[float] = Field(None, gt=0)
     description: Optional[str] = Field(None, max_length=500)
     txn_date: Optional[datetime] = None
     reference_no: Optional[str] = Field(None, max_length=50)

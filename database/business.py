@@ -27,32 +27,21 @@ def get_all_businesses(
     return query.offset(skip).limit(limit).all()
 
 
-def get_business(db: Session, business_id: int) -> Optional[BusinessModel]:
+def get_business(db: Session, business_id: int, current_user = None) -> Optional[BusinessModel]:
     """Get a specific business by ID"""
-    return db.query(BusinessModel).filter(BusinessModel.id == business_id).first()
-
-
-def update_business(
-    db: Session, business_id: int, business_data: dict
-) -> Optional[BusinessModel]:
-    """Update a business"""
-    db_business = db.query(BusinessModel).filter(BusinessModel.id == business_id).first()
-    if db_business is None:
-        return None
-
-    for key, value in business_data.items():
-        setattr(db_business, key, value)
-
-    db.commit()
-    db.refresh(db_business)
-    return db_business
-
+    return db.query(BusinessModel).filter(
+        BusinessModel.id == business_id,
+        BusinessModel.user_id == current_user.id
+    ).first()
 
 def partial_update_business(
-    db: Session, business_id: int, business_data: dict
+    db: Session, business_id: int, business_data: dict, current_user = None
 ) -> Optional[BusinessModel]:
     """Partially update a business"""
-    db_business = db.query(BusinessModel).filter(BusinessModel.id == business_id).first()
+    db_business = db.query(BusinessModel).filter(
+        BusinessModel.id == business_id,
+        BusinessModel.user_id == current_user.id
+    ).first()
     if db_business is None:
         return None
 
@@ -76,9 +65,12 @@ def partial_update_business(
     return db_business
 
 
-def delete_business(db: Session, business_id: int) -> bool:
+def delete_business(db: Session, business_id: int, current_user = None) -> bool:
     """Delete a business"""
-    db_business = db.query(BusinessModel).filter(BusinessModel.id == business_id).first()
+    db_business = db.query(BusinessModel).filter(
+        BusinessModel.id == business_id,
+        BusinessModel.user_id == current_user.id
+    ).first()
     if db_business is None:
         return False
 
