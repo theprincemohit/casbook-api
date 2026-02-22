@@ -9,7 +9,7 @@ load_dotenv()
 # Database URL
 DATABASE_URL = os.getenv(
     "DATABASE_URL",
-    "postgresql://postgres:postgres@localhost:5432/cashbook"
+    "postgresql://mohitcashbookapp:mohitcashbookapppassword@localhost:5432/cashbook"
 )
 
 # Create engine
