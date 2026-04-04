@@ -24,11 +24,17 @@ def read_transactions(
     passbook_id: Optional[int] = Query(None, ge=1),
     skip: int = Query(0, ge=0),
     limit: int = Query(10, ge=1, le=100),
+    type: Optional[str] = Query(None, regex="^(credit|debit)$"),
+    search: Optional[str] = Query(None, max_length=100),
+    date_from: Optional[str] = Query(None, regex="^\d{4}-\d{2}-\d{2}$"),
+    date_to: Optional[str] = Query(None, regex="^\d{4}-\d{2}-\d{2}$"),
     db: Session = Depends(get_db),
     current_user = Depends(validate_token)
 ):
     """Get all transactions with optional filtering and pagination"""
-    return database_transaction.get_all_transactions(db, skip=skip, limit=limit, 
+    return database_transaction.get_all_transactions(db, skip=skip, limit=limit,
+                                                     type=type, search=search,
+                                                     date_from=date_from, date_to=date_to,
                                                      passbook_id=passbook_id,
                                                      user_id=current_user.id)
 

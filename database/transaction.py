@@ -15,6 +15,8 @@ def create_new_transaction(db: Session, transaction_data: dict) -> TransactionMo
 
 def get_all_transactions(
     db: Session, skip: int = 0, limit: int = 10, 
+    type: Optional[str] = None, search: Optional[str | float] = None,
+    date_from: Optional[str] = None, date_to: Optional[str] = None,
     passbook_id: Optional[int] = None,
     user_id: Optional[int] = None
 ) -> List[TransactionModel]:
@@ -23,6 +25,19 @@ def get_all_transactions(
 
     if passbook_id is not None:
         query = query.filter(TransactionModel.passbook_id == passbook_id)
+    
+    if type is not None:
+        query = query.filter(TransactionModel.txn_type == type)
+
+    if search is not None:
+        query = query.filter(TransactionModel.description.ilike(f"%{search}%"))
+    
+
+    if date_from is not None:
+        query = query.filter(TransactionModel.txn_date >= date_from)
+
+    if date_to is not None:
+        query = query.filter(TransactionModel.txn_date <= date_to)
 
     query = query.filter(TransactionModel.user_id == user_id)
 
