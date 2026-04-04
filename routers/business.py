@@ -12,7 +12,17 @@ router = APIRouter(prefix="/businesses", tags=["businesses"])
 @router.post("/", response_model=Business, status_code=201)
 def create_business(business: BusinessCreate, db: Session = Depends(get_db), current_user = Depends(validate_token)):
     """Create a new business"""
-    new_business = database_business.create_new_business(db, business.model_dump())
+    data  = business.model_dump()
+    data["user_id"] = current_user.id
+    new_business = database_business.create_new_business(db, data)
+    return new_business
+
+@router.post("/create-first-business", response_model=Business, status_code=201)
+def create_first_business(business: BusinessCreate, db: Session = Depends(get_db), current_user = Depends(validate_token)):
+    """Create the first business for a user"""
+    data  = business.model_dump()
+    data["user_id"] = current_user.id
+    new_business = database_business.create_new_business(db, data, is_first=True)
     return new_business
 
 
@@ -20,12 +30,11 @@ def create_business(business: BusinessCreate, db: Session = Depends(get_db), cur
 def read_businesses(
     skip: int = Query(0, ge=0),
     limit: int = Query(10, ge=1, le=100),
-    industry: Optional[str] = None,
     db: Session = Depends(get_db),
     current_user = Depends(validate_token)
 ):
     """Get all businesses with optional filtering and pagination"""
-    return database_business.get_all_businesses(db, skip=skip, limit=limit, industry=industry, current_user=current_user)
+    return database_business.get_all_businesses(db, skip=skip, limit=limit, current_user=current_user)
 
 
 @router.get("/{business_id}", response_model=Business)

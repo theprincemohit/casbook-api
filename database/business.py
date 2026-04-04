@@ -4,17 +4,27 @@ from sqlalchemy import func
 from models.business import BusinessModel
 
 
-def create_new_business(db: Session, business_data: dict) -> BusinessModel:
+def create_new_business(db: Session, business_data: dict, is_first: bool = False) -> BusinessModel:
     """Create a new business in database"""
     db_business = BusinessModel(**business_data)
     db.add(db_business)
+    if is_first:
+        db.flush()  # Ensure the business ID is generated before creating passbook
+        from database.passbook import create_new_passbook
+        passbook_data = {
+            "name": f"{db_business.name} Passbook",
+            "description": f"Passbook for {db_business.name}",
+            "business_id": db_business.id,
+            "user_id": business_data["user_id"]
+        }
+        create_new_passbook(db, passbook_data)
     db.commit()
     db.refresh(db_business)
     return db_business
 
 
 def get_all_businesses(
-    db: Session, skip: int = 0, limit: int = 10, industry: Optional[str] = None, current_user = None
+    db: Session, skip: int = 0, limit: int = 10, current_user = None
 ) -> List[BusinessModel]:
     """Get all businesses with optional filtering"""
     query = db.query(BusinessModel)
@@ -48,12 +58,7 @@ def partial_update_business(
     # Only update provided fields
     allowed_fields = {
         "name",
-        "description",
-        "industry",
-        "founded_year",
-        "revenue",
-        "employees",
-        "location",
+        "description"
     }
 
     for key, value in business_data.items():
@@ -86,22 +91,9 @@ def get_statistics(db: Session) -> dict:
     if count == 0:
         return {
             "total_businesses": 0,
-            "total_employees": 0,
-            "average_revenue": 0.0,
-            "industries": [],
         }
-
-    total_employees = db.query(func.sum(BusinessModel.employees)).scalar() or 0
-    average_revenue = (
-        db.query(func.avg(BusinessModel.revenue)).scalar() or 0.0
-    )
-    industries = [
-        row[0] for row in db.query(BusinessModel.industry.distinct()).all()
-    ]
 
     return {
         "total_businesses": count,
-        "total_employees": total_employees,
-        "average_revenue": float(average_revenue),
-        "industries": industries,
+       
     }

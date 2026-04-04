@@ -11,11 +11,6 @@ class BusinessModel(Base):
     user_id = Column(Integer(), nullable=False)
     name = Column(String(100), nullable=False)
     description = Column(String(500), nullable=True)
-    industry = Column(String(100), nullable=False)
-    founded_year = Column(Integer, nullable=False)
-    revenue = Column(Float, default=0.0)
-    employees = Column(Integer, default=1)
-    location = Column(String(150), nullable=False)
     created_at = Column(DateTime, default=datetime.utcnow)
     updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
 
@@ -26,11 +21,6 @@ class BusinessModel(Base):
             "user_id": self.user_id,
             "name": self.name,
             "description": self.description,
-            "industry": self.industry,
-            "founded_year": self.founded_year,
-            "revenue": self.revenue,
-            "employees": self.employees,
-            "location": self.location,
             "created_at": self.created_at,
             "updated_at": self.updated_at,
         }

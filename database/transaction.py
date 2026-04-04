@@ -26,7 +26,7 @@ def get_all_transactions(
 
     query = query.filter(TransactionModel.user_id == user_id)
 
-    return query.offset(skip).limit(limit).all()
+    return query.order_by(TransactionModel.txn_date.desc()).offset(skip).limit(limit).all()
 
 
 def get_transaction(db: Session, transaction_id: int, user_id: int) -> Optional[TransactionModel]:
